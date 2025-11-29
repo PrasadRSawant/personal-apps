@@ -13,6 +13,7 @@ app = FastAPI(
     description="Backend for file and image processing tools with JWT security.",
     version="1.0.0",
 )
+
 #configure_logging()
 origins = settings.CORS_ALLOWED_ORIGINS.split(',') if settings.CORS_ALLOWED_ORIGINS else []
 app.add_middleware(
