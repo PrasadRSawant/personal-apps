@@ -3,50 +3,36 @@ name: Python CI/CD to Linux Server
 on:
   push:
     branches:
-      - main
+      - main # Triggers the workflow when code is pushed to the 'main' branch
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
     
-  permissions:
-    contents: read
-    
-  steps:
-    - name: Checkout Code 🛎️
-      # This step needs 'contents: read' to fetch the code
-      uses: actions/checkout@v4
+    # 💥 SECURITY FIX: Add the permissions block here
+    permissions:
+      contents: read
+      
+    steps:
+      - name: Checkout Code 🛎️
+        # This step needs 'contents: read' to fetch the code
+        uses: actions/checkout@v4
 
-    - name: Deploy via SSH 🚀
-      uses: appleboy/ssh-action@v1.0.3
-      with:
-        # SSH credentials stored as GitHub Secrets
-        host: ${{ secrets.VPS_HOST }}
-        username: ${{ secrets.SSH_USER }}
-        key: ${{ secrets.SSH_PRIVATE_KEY }}
-        
-        # Deployment script executed on the remote Linux server
-        script: |
-          echo "Starting deployment script..."
-          
-          # Navigate to the main project directory and pull latest code
-          cd /var/www/personal-app
-          echo "Pulling latest code from main branch..."
-          git pull origin main
-          
-          # Activate the virtual environment and install/update Python dependencies
-          echo "Activating virtual environment and installing dependencies..."
-          source venv/bin/activate
-          pip3 install -r requirements.txt
-          deactivate
-          
-          # Reload systemd and restart the application service (assuming Gunicorn/Uvicorn service)
-          echo "Restarting application service..."
-          sudo systemctl daemon-reload
-          sudo systemctl restart personal-apps.service
-          
-          # Test Nginx configuration and reload Nginx
-          echo "Checking Nginx configuration and reloading..."
-          sudo nginx -t
-          sudo systemctl reload nginx
-          
-          echo "Deployment completed successfully!"
+      - name: Deploy via SSH 🚀
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            # --- Deployment Script on your Linux Server ---
+            cd /var/www/personal-app
+            git pull origin main
+            
+            source venv/bin/activate
+            pip install -r requirements.txt
+            
+            sudo systemctl daemon-reload
+            sudo systemctl restart personal-apps.service
+            sudo nginx -t
+            sudo systemctl reload nginx
