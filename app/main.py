@@ -1,9 +1,8 @@
 from fastapi import FastAPI
 from app.api import auth, file_tools, image_tools, status
 from fastapi.middleware.cors import CORSMiddleware
-from app.core.config import settings, configure_logging
+from app.core.config import settings
 from fastapi_limiter import FastAPILimiter
-import redis.asyncio as redis
 from app.core.dependencies import get_redis_client
 
 # Initialize FastAPI application
@@ -13,7 +12,6 @@ app = FastAPI(
     version="1.0.0",
 )
 
-#configure_logging()
 origins = settings.CORS_ALLOWED_ORIGINS.split(',') if settings.CORS_ALLOWED_ORIGINS else []
 app.add_middleware(
     CORSMiddleware,
