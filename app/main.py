@@ -1,6 +1,5 @@
 from fastapi import FastAPI
 from app.api import auth, file_tools, image_tools, status
-from app.db.database import create_db_tables
 from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import settings, configure_logging
 from fastapi_limiter import FastAPILimiter
@@ -38,9 +37,7 @@ async def startup():
     # 3. Initialize the FastAPILimiter with the client
     await FastAPILimiter.init(redis_client)
 
-# Run this once on startup to ensure tables exist
-# In production, use migrations (Alembic) instead
-# create_db_tables() 
+
 
 # Include all the API routers
 app.include_router(auth.router, prefix="/auth", tags=["Authentication"])
